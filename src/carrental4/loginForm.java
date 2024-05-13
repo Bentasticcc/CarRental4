@@ -8,6 +8,8 @@ package carrental4;
 import admin.adminDashboard;
 import config.Session;
 import config.dbConnector;
+import config.passwordHasher;
+import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JOptionPane;
@@ -32,25 +34,32 @@ public class loginForm extends javax.swing.JFrame {
     public static boolean loginAcc(String username, String password){
         dbConnector connector = new dbConnector();
         try{
-            String query = "SELECT * FROM tbl_user  WHERE u_name = '" + username + "' AND u_pass = '" + password + "'";
+            String query = "SELECT * FROM tbl_user  WHERE u_name = '" + username + "'";
             ResultSet resultSet = connector.getData(query);
-            if(resultSet.next()){        
-            status = resultSet.getString("u_status");
-            type = resultSet.getString("u_type");
-            Session sess = Session.getInstance();
-            sess.setUid(resultSet.getInt("u_id"));
-            sess.setFname(resultSet.getString("u_fname"));
-            sess.setLname(resultSet.getString("u_lname"));
-            sess.setEmail(resultSet.getString("u_email"));
-            sess.setName(resultSet.getString("u_username"));
-            sess.setType(resultSet.getString("u_type"));
-            sess.setStatus(resultSet.getString("u_status"));
-            return true;
+            if(resultSet.next()){     
+   
+                String hashedPass = resultSet.getString("u_pass");
+                String rehashedPass = passwordHasher.hashPassword(password);
+                
+                if(hashedPass.equals(rehashedPass)){        
+                status = resultSet.getString("u_status");   
+                type = resultSet.getString("u_type");
+                Session sess = Session.getInstance();
+                sess.setUid(resultSet.getInt("u_id"));
+                sess.setFname(resultSet.getString("u_fname"));
+                sess.setLname(resultSet.getString("u_lname"));
+                sess.setEmail(resultSet.getString("u_email"));
+                sess.setName(resultSet.getString("u_name"));
+                sess.setType(resultSet.getString("u_type"));
+                sess.setStatus(resultSet.getString("u_status"));
+                return true;   
+                }else{
+                return false;
+                }
         }else{
             return false;
-        }
-            
-        }catch (SQLException ex) {
+        }          
+        }catch (SQLException | NoSuchAlgorithmException ex) {
             return false;
         }
 
@@ -95,6 +104,11 @@ public class loginForm extends javax.swing.JFrame {
         });
 
         jButton2.setText("EXIT");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(153, 153, 255));
@@ -205,6 +219,10 @@ public class loginForm extends javax.swing.JFrame {
     private void userActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_userActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
