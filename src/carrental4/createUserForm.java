@@ -9,13 +9,20 @@ import admin.usersForm;
 import static carrental4.regForm.email;
 import static carrental4.regForm.usname;
 import config.dbConnector;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 /**
@@ -41,7 +48,7 @@ public class createUserForm extends javax.swing.JFrame {
         File file = new File(path);
         String fileName = file.getName();
         
-        Path filePath = Paths.get("src/userimages", fileName);
+        Path filePath = Paths.get("src/usersimages", fileName);
         boolean fileExists = Files.exists(filePath);
         
         if (fileExists) {
@@ -50,6 +57,44 @@ public class createUserForm extends javax.swing.JFrame {
             return 0;
         }
     
+    }
+    
+    public static int getHeightFromWidth(String imagePath, int desiredWidth) {
+        try {
+            // Read the image file
+            File imageFile = new File(imagePath);
+            BufferedImage image = ImageIO.read(imageFile);
+            
+            // Get the original width and height of the image
+            int originalWidth = image.getWidth();
+            int originalHeight = image.getHeight();
+            
+            // Calculate the new height based on the desired width and the aspect ratio
+            int newHeight = (int) ((double) desiredWidth / originalWidth * originalHeight);
+            
+            return newHeight;
+        } catch (IOException ex) {
+            System.out.println("No image found!");
+        }
+        
+        return -1;
+    }    
+    
+    
+    public  ImageIcon ResizeImage(String ImagePath, byte[] pic, JLabel label) {
+        ImageIcon MyImage = null;
+            if(ImagePath !=null){
+                MyImage = new ImageIcon(ImagePath);
+            }else{
+                MyImage = new ImageIcon(pic);
+            }
+
+        int newHeight = getHeightFromWidth(ImagePath, label.getWidth());
+
+        Image img = MyImage.getImage();
+        Image newImg = img.getScaledInstance(label.getWidth(), newHeight, Image.SCALE_SMOOTH);
+        ImageIcon image = new ImageIcon(newImg);
+        return image;
     }
     
     public boolean duplicateCheck(){
@@ -146,10 +191,10 @@ public class createUserForm extends javax.swing.JFrame {
         refresh = new javax.swing.JButton();
         fn = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
         select = new javax.swing.JButton();
         remove = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        image = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -251,10 +296,6 @@ public class createUserForm extends javax.swing.JFrame {
         jLabel8.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel8.setText("First Name:");
 
-        jPanel2.setLayout(null);
-        jPanel2.add(jLabel9);
-        jLabel9.setBounds(0, 0, 220, 210);
-
         select.setText("SELECT");
         select.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -263,6 +304,17 @@ public class createUserForm extends javax.swing.JFrame {
         });
 
         remove.setText("REMOVE");
+        remove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeActionPerformed(evt);
+            }
+        });
+
+        jPanel2.setLayout(null);
+
+        image.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jPanel2.add(image);
+        image.setBounds(10, 10, 200, 190);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -316,15 +368,15 @@ public class createUserForm extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(cancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(refresh, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE))
+                        .addComponent(refresh, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGap(37, 37, 37)
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(select)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(remove)))))
+                                .addComponent(select, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(33, 33, 33)
+                                .addComponent(remove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                 .addGap(66, 66, 66))
         );
         jPanel3Layout.setVerticalGroup(
@@ -373,9 +425,9 @@ public class createUserForm extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(us, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7)
-                    .addComponent(remove)
-                    .addComponent(select))
-                .addContainerGap(22, Short.MAX_VALUE))
+                    .addComponent(select)
+                    .addComponent(remove))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -383,9 +435,7 @@ public class createUserForm extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -405,8 +455,7 @@ public class createUserForm extends javax.swing.JFrame {
 
     private void addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addActionPerformed
 
-        if(uid.getText().isEmpty()|| ln.getText().isEmpty()||em.getText().isEmpty()||un.getText().isEmpty()||
-            ps.getText().isEmpty()){
+        if(fn.getText().isEmpty()|| ln.getText().isEmpty()||em.getText().isEmpty()||un.getText().isEmpty()||ps.getText().isEmpty()){
             JOptionPane.showMessageDialog(null, "All fields are required!");
         }else if(ps.getText().length() <8){
             JOptionPane.showMessageDialog(null, "Password character should be 8 and above");
@@ -414,14 +463,20 @@ public class createUserForm extends javax.swing.JFrame {
         }else if(duplicateCheck()){
             System.out.println("Duplicate Exist!");
         }else{
+            
             dbConnector dbc = new dbConnector();
-            if(dbc.insertData("INSERT INTO tbl_user (u_fname, u_lname, u_email, u_name, u_pass, u_type, u_status) "
-                + "VALUES ('"+uid.getText()+"','"+ln.getText()+"','"+em.getText()+"','"+un.getText()+"','"+ps.getText()+"','"+ut.getSelectedItem()+"','"+us.getSelectedItem()+"')"))
+            if(dbc.insertData("INSERT INTO tbl_user (u_fname, u_lname, u_email, u_name, u_pass, u_type, u_status, u_image) "
+                + "VALUES ('"+fn.getText()+"','"+ln.getText()+"','"+em.getText()+"','"+un.getText()+"','"+ps.getText()+"','"+ut.getSelectedItem()+"',"+us.getSelectedItem()+"','"+destination+"')"))
         {
+            try{
+            Files.copy(selectedFile.toPath(),new File(destination).toPath(), StandardCopyOption.REPLACE_EXISTING);
             JOptionPane.showMessageDialog(null, "Inserted Success!");
             usersForm uf = new usersForm();
             uf.setVisible(true);
             this.dispose();
+           }catch(IOException ex){
+                   System.out.println("Insert Image Error: "+ex);
+                   }
         }else{
             JOptionPane.showMessageDialog(null, "Connection Error!");
         }
@@ -434,7 +489,7 @@ public class createUserForm extends javax.swing.JFrame {
 
     private void updateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateActionPerformed
         
-        if(uid.getText().isEmpty()|| ln.getText().isEmpty()||em.getText().isEmpty()||un.getText().isEmpty()||
+        if(fn.getText().isEmpty()|| ln.getText().isEmpty()||em.getText().isEmpty()||un.getText().isEmpty()||
         ps.getText().isEmpty()){
         JOptionPane.showMessageDialog(null, "All fields are required!");
         }else if(ps.getText().length() <8){
@@ -480,25 +535,32 @@ public class createUserForm extends javax.swing.JFrame {
                 if (returnValue == JFileChooser.APPROVE_OPTION) {
                     try {
                         selectedFile = fileChooser.getSelectedFile();
-                        destination = "src/userimages/" + selectedFile.getName();
+                        destination = "src/usersimages/" + selectedFile.getName();
                         path  = selectedFile.getAbsolutePath();
                         
                         
                         if(FileExistenceChecker(path) == 1){
                           JOptionPane.showMessageDialog(null, "File Already Exist, Rename or Choose another!");
                             destination = "";
-                            path="";
+                            path= "";
                         }else{
                             image.setIcon(ResizeImage(path, null, image));
-                            browse.setVisible(true);
-                            browse.setText("REMOVE");
-                            browse1.setVisible(false);
+                            select.setEnabled(false);
+                            remove.setEnabled(true);
                         }
                     } catch (Exception ex) {
                         System.out.println("File Error!");
                     }
                 }
     }//GEN-LAST:event_selectActionPerformed
+
+    private void removeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeActionPerformed
+        remove.setEnabled(false);
+        select.setEnabled(true);
+        image.setIcon(null);
+        destination = "";
+        path = "";
+    }//GEN-LAST:event_removeActionPerformed
 
     /**
      * @param args the command line arguments
@@ -542,6 +604,7 @@ public class createUserForm extends javax.swing.JFrame {
     public javax.swing.JButton delete;
     public javax.swing.JTextField em;
     public javax.swing.JTextField fn;
+    public javax.swing.JLabel image;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -550,15 +613,14 @@ public class createUserForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
+    public javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     public javax.swing.JTextField ln;
     public javax.swing.JTextField ps;
     private javax.swing.JButton refresh;
-    public javax.swing.JButton remove;
-    public javax.swing.JButton select;
+    private javax.swing.JButton remove;
+    private javax.swing.JButton select;
     public javax.swing.JTextField uid;
     public javax.swing.JTextField un;
     public javax.swing.JButton update;
